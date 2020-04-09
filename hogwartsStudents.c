@@ -5,7 +5,7 @@
 void insert(Student** root, Student* node);
 Student* search(Student* root, char* first, char* last);
 Student* delete(Student** root, char* first, char* last);
-void quit(Contact* root);
+void quit(Student* root);
 
 //Insert a node into a tree, obeying ordering constraints. Note: You should check that a student doesn't exist before adding him or her to a tree. There should be no duplicates in a roster.
 void insert(Student** root, Student* node)
@@ -131,7 +131,7 @@ int main(int argc, char **argv)
          ++i;
          firstname = argv[i];
          ++i;
-         lastname = argvi[i];
+         lastname = argv[i];
          ++i;
          house = argv[i];
          ++i;
