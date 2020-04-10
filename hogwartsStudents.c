@@ -1,56 +1,135 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "Student.h"
 
-void insert(Student** root, Student* node);
+
+Student* createStudent(char* first, char* last, int points, int year, House house);
+Student* insert(Student* root, Student* node);
 Student* search(Student* root, char* first, char* last);
 Student* delete(Student** root, char* first, char* last);
+int compareStudent(Student* student, char* first, char* last);
+void printStudent(const Student* student);
 void quit(Student* root);
 
-//Insert a node into a tree, obeying ordering constraints. Note: You should check that a student doesn't exist before adding him or her to a tree. There should be no duplicates in a roster.
-void insert(Student** root, Student* node)
+/*
+ * Function: createStudent, takes information about a student and creates a new node.
+ * Returns:  a pointer to a student. 
+ */
+Student* createStudent(char* first, char* last, int points, int year, House house)
 {
+  Student* temp = (Student*)malloc(sizeof(Student));
+  temp->first = strdup(first);
+  temp->last = strdup(last);
+  temp->points = points;
+  temp->year = year;
+  temp->house = house;
+  temp->left = NULL;
+  temp->right = NULL;
 
+  return temp;
 }
 
-//Search in a tree for a student with a given first and last name. Return a pointer to the student if found, NULL otherwise.
+/*
+ * Function: printStudent, prints student information
+ * Returns:  
+ */
+
+void printStudent(const Student* student) {
+  printf("\t%s %s\n", student->first, student->last);
+  printf("\t%d", student->points);
+  printf("\t%d", student->year);
+  printf("\t%u", student->house);
+}
+
+/*
+ * Function: compareStudent, takes a pointer to a student, then compares the node's name 
+ *            with the given first and last name.
+ * Returns:  an int, 0 if they are equal, greater than 0 if the s1 is > than s2, and less than 0 if s1 > s2.
+ */
+int compareStudent(Student* student, char* first, char* last) {
+  int difference = strcmp(student->last, last);
+  if (difference == 0) {
+    difference = strcmp(student->first, first);
+  }
+  return difference;
+}
+
+/*
+ * Function: insert, inserts a node into a tree.
+ * Returns:  a pointer to a student. 
+ */
+
+Student* insert(Student* root, Student* node) 
+{
+  if(root == NULL) {
+    return node;
+  }
+  int difference = compareStudent(root, node->first, node->last);
+  if( difference == 0)
+    printf("Error: Student exist");
+  else if(difference > 0) 
+    root->left = insert(root->left, node);
+  else 
+    root->right = insert(root->right, node);
+  
+  return root;
+}
+
+/*
+ * Function: search, searches for a student by first and last name.
+ * Returns:  a pointer to a student. 
+ */
+
 Student* search(Student* root, char* first, char* last)
 {
-
+  if(root == NULL) {
+    return root;
+  }
+  int difference = compareStudent(root, first, last);
+  if(difference == 0) 
+    return root;
+  else if(difference > 0) {
+    return search(root->left, first, last); 
+  } else 
+    return search(root->right, first, last);
 }
+
+/*
+ * Function: delete, searches through a tree and removes the Student from the tree if the student exists.
+ * Returns:  a pointer to a student. 
 
 //Remove a student from a tree and return a pointer to the node containing the student or NULL if the student is not found.
 Student* delete(Student** root, char* first, char* last)
 {
-
+  
 }
+ */
 
 int main()
 {
-  Student student;
-
-  Student* GryffindorRoot = NULL;
-  Student* SlytherinRoot = NULL;
-  Student* HufflepuffRoot = NULL;
-  Student* RavenclawRoot = NULL;
-  Student* deceasedRoot = NULL;
+  //an array (one for each house) initialized to null.
+  Student* houses[] = { NULL, NULL, NULL, NULL, NULL };
+  
   Student* found = NULL;
 
-  //int i = 1;
-  char* filename;
-  char* firstname;
-  char* lastname;
+  // intialize all arrays to size 1024, so we can fill them later
+  char fileName[1024];
+  char firstName[1024];
+  char lastName[1024];
+  char houseName[1024];
   int points;
   int year;
   int number;
+  int i = 0;
   House house;
 
-  char input[20];
+  char input[1024] = "";
 
    while(strcmp(input, "quit") != 0)
   {
     printf("Please enter a command.\n");
-    scanf("%[^\n]%*c", input);
+    scanf("%s", input);
 
      if (strcmp(input, "help") == 0)
      {
@@ -79,58 +158,87 @@ int main()
        printf("quit: \nQuit the program.\n");
        printf("\n");
      }
-     if (strcmp(input, "load") == 0)
+     else if (strcmp(input, "load") == 0)
      {
-      filename = scanf("%[^\n]%*c", filename);
+       /*
+        * Note: We changed the regex things because scanf returns an int, the number of things 
+        * read correctly, not the actual string. Which is why I went through and changed all of the 
+        * char*'s above to just char[] arrays of size 1024 so we can read the string into them.
+        * 
+        * This changes are the only thing we did to the menu.
+        */ 
+      scanf("%s", fileName);
      }
-     if (strcmp(input, "save") == 0)
+     else if (strcmp(input, "save") == 0)
      {
-      filename = scanf("%[^\n]%*c", filename);
+      scanf("%s", fileName);
      }
-     if (strcmp(input, "clear") == 0)
+     else if (strcmp(input, "clear") == 0)
      {
        printf("call clear().\n");
      }
-     if (strcmp(input, "inorder") == 0)
+     else if (strcmp(input, "inorder") == 0)
      {
        printf("call inorder().\n");
      }
-     if (strcmp(input, "preorder") == 0)
+     else if (strcmp(input, "preorder") == 0)
      {
        printf("call preorder().\n");
      }
-     if (strcmp(input, "postorder") == 0)
+     else if (strcmp(input, "postorder") == 0)
      {
        printf("call postorder().\n");
      }
-     if (strcmp(input, "add") == 0)
+     else if (strcmp(input, "add") == 0)
      {
-       firstname = scanf("%[^\n]%*c", firstname);
-       lastname = scanf("%[^\n]%*c", lastname);
-       points = scanf("%d", &points);
-       year = scanf("%d", &year);
-       house = scanf("%[^\n]%*c", house);
+       printf("Student's First Name: ");
+       scanf("%s", firstName);
+       printf("\nStudent's Last Name: ");
+       scanf("%s", lastName);
+       printf("\nStudent's Points: ");
+       scanf("%d", &points);
+       printf("\nStudent's Year Number: ");
+       scanf("%d", &year);
+       printf("\nStudent's House Name: ");
+       scanf("%s", houseName);
+       Student* node = createStudent(firstName, lastName, points, year, house);
+       insert(houses[i], node);
      }
-     if (strcmp(input, "kill") == 0)
+     else if (strcmp(input, "kill") == 0)
      {
-      firstname = scanf("%[^\n]%*c", firstname);
-      lastname = scanf("%[^\n]%*c", lastname);
-      house = scanf("%[^\n]%*c", house);
+      printf("Student's First Name: ");
+      scanf("%s", firstName);
+      printf("\nStudent's Last Name: ");
+      scanf("%s", lastName);
+      printf("\nStudent's House Name: ");
+      scanf("%s", houseName);
      }
-     if (strcmp(input, "find") == 0)
+     else if (strcmp(input, "find") == 0)
      {
-       firstname = scanf("%[^\n]%*c", firstname);
-       lastname = scanf("%[^\n]%*c", lastname);
-       house = scanf("%[^\n]%*c", house);
+       printf("Student's First Name: ");
+       scanf("%s", firstName);
+       printf("\nStudent's Last Name: ");
+       scanf("%s", lastName);
+       printf("\nStudent's House Name: ");
+       scanf("%u", &house); // don't know exactly how to get our houses array working and the houseName consolidated so we can use that value to identify a student
+       Student* temp = (Student*)malloc(sizeof(Student));
+       temp->first = strdup(firstName);
+       temp->last = strdup(lastName);
+       temp->house = house;
+       /* Note: following code works but doesn't print the exact thing we want.*/
+       found = search(temp, temp->first, temp->last);
+       if( found == NULL )
+					printf("\"%s\" not found\n", firstName);
+				else
+					printStudent( found );
      }
-     if (strcmp(input, "points") == 0)
+     else if (strcmp(input, "points") == 0)
      {
-       firstname = scanf("%[^\n]%*c", firstname);
-       lastname = scanf("%[^\n]%*c", lastname);
-       house = scanf("%[^\n]%*c", house);
-       number = scanf("%d", &number);
-     }
-     if (strcmp(input, "score") == 0)
+       scanf("%s", firstName);
+       scanf("%s", lastName);
+       scanf("%s", houseName);
+       scanf("%d", &number);
+     } else if (strcmp(input, "score") == 0)
      {
        printf("call score()\n");
      }
