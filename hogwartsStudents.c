@@ -42,6 +42,18 @@ void printStudent(const Student* student) {
 }
 
 /*
+ * Function: printInOrder, takes a pointer to a student,
+ * Returns:  Nothing. Prints the tree from left subtree -> root -> right subtree.
+ */
+void printInOrder(Student* root) {
+  if (root != NULL) {
+    printInOrder(root->left);
+    printStudent(root);
+    printInOrder(root->right);
+  }
+}
+
+/*
  * Function: compareStudent, takes a pointer to a student, then compares the node's name 
  *            with the given first and last name.
  * Returns:  an int, 0 if they are equal, greater than 0 if the s1 is > than s2, and less than 0 if s1 > s2.
@@ -193,7 +205,11 @@ int main()
      }
      else if (strcmp(input, "inorder") == 0)
      {
-       printf("call inorder().\n");
+        /* If you add a bunch of students and try to print them, this works but returns a segmentation fault at the end. */
+        printf("call inorder().\n");
+        for(int i = 0; i <= 5; ++i){
+          printInOrder(houses[i]);
+        }
      }
      else if (strcmp(input, "preorder") == 0)
      {
@@ -207,13 +223,13 @@ int main()
      {
        printf("Student's First Name: ");
        scanf("%s", firstName);
-       printf("\nStudent's Last Name: ");
+       printf("Student's Last Name: ");
        scanf("%s", lastName);
-       printf("\nStudent's Points: ");
+       printf("Student's Points: ");
        scanf("%d", &points);
-       printf("\nStudent's Year Number: ");
+       printf("Student's Year Number: ");
        scanf("%d", &year);
-       printf("\nStudent's House Name: ");
+       printf("Student's House Name: ");
        scanf("%s", houseName);
        house = getHouse(houseName);
        Student* node = createStudent(firstName, lastName, points, year, house);
@@ -223,22 +239,20 @@ int main()
      {
       printf("Student's First Name: ");
       scanf("%s", firstName);
-      printf("\nStudent's Last Name: ");
+      printf("Student's Last Name: ");
       scanf("%s", lastName);
-      printf("\nStudent's House Name: ");
+      printf("Student's House Name: ");
       scanf("%s", houseName);
      }
      else if (strcmp(input, "find") == 0)
      {
        printf("Student's First Name: ");
        scanf("%s", firstName);
-       printf("\nStudent's Last Name: ");
+       printf("Student's Last Name: ");
        scanf("%s", lastName);
-       printf("\nStudent's House Name: ");
+       printf("Student's House Name: ");
        scanf("%s", houseName);
        house = getHouse(houseName);
-       // don't know exactly how to get our houses array working and the houseName consolidated so we can use that value to identify a student
-       /* Note: following code works but doesn't print the exact thing we want.*/
        found = search(houses[house], firstName, lastName);
        if( found == NULL )
 					printf("%s not found.", firstName);
