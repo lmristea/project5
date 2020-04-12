@@ -36,10 +36,9 @@ Student* createStudent(char* first, char* last, int points, int year, House hous
  */
 
 void printStudent(const Student* student) {
-  printf("\t%s %s\n", student->first, student->last);
-  printf("\t%d", student->points);
-  printf("\t%d", student->year);
-  printf("\t%u", student->house);
+  char fullName[1024];
+  sprintf(fullName, "%s %s", student->first, student->last);
+  printf("%-25s%d\t%d\t%s\n", fullName, student->points, student->year, HOUSE_NAMES[student->house]);
 }
 
 /*
@@ -53,6 +52,21 @@ int compareStudent(Student* student, char* first, char* last) {
     difference = strcmp(student->first, first);
   }
   return difference;
+}
+
+/*
+ * Function: getHouse, takes a string.
+ * Returns:  an int, 0 if the string passed in is equal to one of the Houses, 
+ *           anything else will return an error if not found.
+ */
+
+int getHouse(char* house) {
+  for(int i = GRYFFINDOR; i <= SLYTHERIN; ++i) {
+    if(strcmp(house, HOUSE_NAMES[i]) == 0) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 /*
@@ -201,8 +215,9 @@ int main()
        scanf("%d", &year);
        printf("\nStudent's House Name: ");
        scanf("%s", houseName);
+       house = getHouse(houseName);
        Student* node = createStudent(firstName, lastName, points, year, house);
-       insert(houses[i], node);
+       houses[house] = insert(houses[house], node);
      }
      else if (strcmp(input, "kill") == 0)
      {
@@ -220,15 +235,13 @@ int main()
        printf("\nStudent's Last Name: ");
        scanf("%s", lastName);
        printf("\nStudent's House Name: ");
-       scanf("%u", &house); // don't know exactly how to get our houses array working and the houseName consolidated so we can use that value to identify a student
-       Student* temp = (Student*)malloc(sizeof(Student));
-       temp->first = strdup(firstName);
-       temp->last = strdup(lastName);
-       temp->house = house;
+       scanf("%s", houseName);
+       house = getHouse(houseName);
+       // don't know exactly how to get our houses array working and the houseName consolidated so we can use that value to identify a student
        /* Note: following code works but doesn't print the exact thing we want.*/
-       found = search(temp, temp->first, temp->last);
+       found = search(houses[house], firstName, lastName);
        if( found == NULL )
-					printf("\"%s\" not found\n", firstName);
+					printf("%s not found.", firstName);
 				else
 					printStudent( found );
      }
