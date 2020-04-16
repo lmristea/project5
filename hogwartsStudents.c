@@ -3,6 +3,7 @@
 #include <string.h>
 #include "Student.h"
 
+#define HOUSE_COUNT 5
 
 Student* createStudent(char* first, char* last, int points, int year, House house);
 Student* insert(Student* root, Student* node);
@@ -11,6 +12,7 @@ Student* delete(Student** root, char* first, char* last);
 int compareStudent(Student* student, char* first, char* last);
 void printStudent(const Student* student);
 void quit(Student* root);
+
 
 /*
  * Function: createStudent, takes information about a student and creates a new node.
@@ -54,6 +56,30 @@ void printInOrder(Student* root) {
 }
 
 /*
+ * Function: printPreOrder, takes a pointer to a student,
+ * Returns:  Nothing. Prints the tree from root -> left subtree -> right subtree.
+ */
+void printPreOrder(Student* root) {
+  if (root != NULL) {
+     printStudent(root);
+     printPreOrder(root->left);
+     printPreOrder(root->right);
+  }
+}
+
+/*
+ * Function: printPostOrder, takes a pointer to a student,
+ * Returns:  Nothing. Prints the tree from left subtree -> right subtree -> root.
+ */
+void printPostOrder(Student* root) {
+  if(root != NULL) {
+    printPostOrder(root->left);
+    printPostOrder(root->right);
+    printStudent(root);
+  }
+}
+
+/*
  * Function: compareStudent, takes a pointer to a student, then compares the node's name 
  *            with the given first and last name.
  * Returns:  an int, 0 if they are equal, greater than 0 if the s1 is > than s2, and less than 0 if s1 > s2.
@@ -79,6 +105,28 @@ int getHouse(char* house) {
     }
   }
   return -1;
+}
+
+void load(FILE* file, Student* houses[]) {
+  char firstName[1024];
+  char lastName[1024];
+  char houseName[1024];
+  int points;
+  int year;
+  House house;
+  /* There are 5 things to be read on each line for a student. */
+  while(fscanf(file, "%s %s %d %d %s", firstName, lastName, &points, &year, houseName) == 5) {
+      house = getHouse(houseName);
+
+       if(year < 1 || year > 7){
+         printf("Invalid year.\n");
+       } else if(house == -1 ){
+         printf("Invalid house.\n");
+       } else {
+        Student* node = createStudent(firstName, lastName, points, year, house);
+        houses[house] = insert(houses[house], node);
+       }
+  }
 }
 
 /*
@@ -159,41 +207,41 @@ int main()
 
      if (strcmp(input, "help") == 0)
      {
-       printf("load: \nAdds all the student records in <filename> to the roster. The file is arranged one student per line where each record has the following format.\n");
+       printf("load:\nAdds all the student records in <filename> to the roster. The file is arranged one student per line where each record has the following format.\n");
        printf("\n");
-       printf("save: \nSave the records of all living students in the roster to <filename>.\n");
+       printf("save:\nSave the records of all living students in the roster to <filename>.\n");
        printf("\n");
-       printf("clear: \nClear the rosters for the four houses and for the list of deceased students. Delete all allocated memory.\n");
+       printf("clear:\nClear the rosters for the four houses and for the list of deceased students. Delete all allocated memory.\n");
        printf("\n");
-       printf("inorder: \nPrint out each house in an inorder traversal.\n");
+       printf("inorder:\nPrint out each house in an inorder traversal.\n");
        printf("\n");
-       printf("preorder: \nPrint out each house in a preorder traversal.\n");
+       printf("preorder:\nPrint out each house in a preorder traversal.\n");
        printf("\n");
-       printf("postorder: \nPrint out each house in a postorder traversal.\n");
+       printf("postorder:\nPrint out each house in a postorder traversal.\n");
        printf("\n");
-       printf("add: \nAdd a student with the given attributes to the roster.\n");
+       printf("add:\nAdd a student with the given attributes to the roster.\n");
        printf("\n");
-       printf("kill: \nFind the given student in the given house's roster, remove the student from the house's roster, and add the student to the list of deceased students.\n");
+       printf("kill:\nFind the given student in the given house's roster, remove the student from the house's roster, and add the student to the list of deceased students.\n");
        printf("\n");
-       printf("find: \nFind the given student in the given house's roster and print out his or her data.\n");
+       printf("find:\nFind the given student in the given house's roster and print out his or her data.\n");
        printf("\n");
-       printf("points: \nFind the given student in the given house's roster and add <number> points to their point total.\n");
+       printf("points:\nFind the given student in the given house's roster and add <number> points to their point total.\n");
        printf("\n");
-       printf("score: \nPrint out the current point scores for all houses. Points for deceased students are not factored into their house totals\n");
+       printf("score:\nPrint out the current point scores for all houses. Points for deceased students are not factored into their house totals\n");
        printf("\n");
-       printf("quit: \nQuit the program.\n");
+       printf("quit:\nQuit the program.\n");
        printf("\n");
      }
      else if (strcmp(input, "load") == 0)
      {
-       /*
-        * Note: We changed the regex things because scanf returns an int, the number of things 
-        * read correctly, not the actual string. Which is why I went through and changed all of the 
-        * char*'s above to just char[] arrays of size 1024 so we can read the string into them.
-        * 
-        * This changes are the only thing we did to the menu.
-        */ 
       scanf("%s", fileName);
+      FILE* file = fopen(fileName, "r");
+      if(file == NULL){
+        printf("File DNE.");
+      } else {
+        load(file, houses);
+        fclose(file);
+      }
      }
      else if (strcmp(input, "save") == 0)
      {
@@ -206,18 +254,24 @@ int main()
      else if (strcmp(input, "inorder") == 0)
      {
         /* If you add a bunch of students and try to print them, this works but returns a segmentation fault at the end. */
-        printf("call inorder().\n");
-        for(int i = 0; i <= 5; ++i){
+        for(int i = 0; i < HOUSE_COUNT; ++i){
+          printf("\n%s\n", HOUSE_NAMES[i]);
           printInOrder(houses[i]);
         }
      }
      else if (strcmp(input, "preorder") == 0)
      {
-       printf("call preorder().\n");
+       for(int i = 0; i < HOUSE_COUNT; ++i){
+          printf("\n%s\n", HOUSE_NAMES[i]);
+          printPreOrder(houses[i]);
+        }
      }
      else if (strcmp(input, "postorder") == 0)
      {
-       printf("call postorder().\n");
+       for(int i = 0; i < HOUSE_COUNT; ++i){
+          printf("\n%s\n", HOUSE_NAMES[i]);
+          printPostOrder(houses[i]);
+        }
      }
      else if (strcmp(input, "add") == 0)
      {
@@ -232,8 +286,15 @@ int main()
        printf("Student's House Name: ");
        scanf("%s", houseName);
        house = getHouse(houseName);
-       Student* node = createStudent(firstName, lastName, points, year, house);
-       houses[house] = insert(houses[house], node);
+
+       if(year < 1 || year > 7){
+         printf("Invalid year.\n");
+       } else if(house == -1 ){
+         printf("Invalid house.\n");
+       } else {
+        Student* node = createStudent(firstName, lastName, points, year, house);
+        houses[house] = insert(houses[house], node);
+       }
      }
      else if (strcmp(input, "kill") == 0)
      {
