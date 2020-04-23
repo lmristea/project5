@@ -40,7 +40,8 @@ Student* createStudent(char* first, char* last, int points, int year, House hous
  * Returns:
  */
 
-void printStudent(const Student* student, FILE* file) {
+void printStudent(const Student* student, FILE* file)
+{
   char fullName[1024];
   sprintf(fullName, "%s %s", student->first, student->last);
   fprintf(file, "%-25s Points: %d\t Year: %d\t House: %s\n", fullName, student->points, student->year, HOUSE_NAMES[student->house]);
@@ -50,7 +51,8 @@ void printStudent(const Student* student, FILE* file) {
  * Function: printInOrder, takes a pointer to a student,
  * Returns:  Nothing. Prints the tree from left subtree -> root -> right subtree.
  */
-void printInOrder(Student* root) {
+void printInOrder(Student* root)
+{
   if (root != NULL) {
     printInOrder(root->left);
     printStudent(root, stdout);
@@ -62,7 +64,8 @@ void printInOrder(Student* root) {
  * Function: printPreOrder, takes a pointer to a student,
  * Returns:  Nothing. Prints the tree from root -> left subtree -> right subtree.
  */
-void printPreOrder(Student* root, FILE* file) {
+void printPreOrder(Student* root, FILE* file)
+{
   if (root != NULL) {
      printStudent(root, file);
      printPreOrder(root->left, file);
@@ -73,7 +76,8 @@ void printPreOrder(Student* root, FILE* file) {
  * Function: printPostOrder, takes a pointer to a student,
  * Returns:  Nothing. Prints the tree from left subtree -> right subtree -> root.
  */
-void printPostOrder(Student* root) {
+void printPostOrder(Student* root)
+{
   if(root != NULL) {
     printPostOrder(root->left);
     printPostOrder(root->right);
@@ -86,7 +90,8 @@ void printPostOrder(Student* root) {
  *            with the given first and last name.
  * Returns:  an int, 0 if they are equal, greater than 0 if the s1 is > than s2, and less than 0 if s1 > s2.
  */
-int compareStudent(Student* student, char* first, char* last) {
+int compareStudent(Student* student, char* first, char* last)
+{
   int difference = strcmp(student->last, last);
   if (difference == 0) {
     difference = strcmp(student->first, first);
@@ -100,7 +105,8 @@ int compareStudent(Student* student, char* first, char* last) {
  *           anything else will return an error if not found.
  */
 
-int getHouse(char* house) {
+int getHouse(char* house)
+{
   for(int i = GRYFFINDOR; i <= SLYTHERIN; ++i) {
     if(strcmp(house, HOUSE_NAMES[i]) == 0) {
       return i;
@@ -109,7 +115,8 @@ int getHouse(char* house) {
   return -1;
 }
 
-void load(FILE* file, Student* houses[]) {
+void load(FILE* file, Student* houses[])
+{
   char firstName[1024];
   char lastName[1024];
   char houseName[1024];
@@ -254,7 +261,8 @@ Student* delete(Student** root, char* first, char* last)
  * Function: clearStudent, frees a student node.
 */
 
-void clearStudent(Student* root){
+void clearStudent(Student* root)
+{
     if (root != NULL) {
         clearStudent(root->left);
         clearStudent(root->right);
@@ -265,10 +273,19 @@ void clearStudent(Student* root){
 }
 
 /*
+ * Function: getScore: counts up the total points in each house.
+ */
+int getScore()
+  {
+
+  }
+
+/*
  * Function: clear, frees a tree.
 */
 
-void clear(Student* houses[]){
+void clear(Student* houses[])
+{
     for(int i = 0; i < HOUSES; ++i) {
         clearStudent(houses[i]);
         clearStudent(houses[DECEASED]);
@@ -276,7 +293,6 @@ void clear(Student* houses[]){
         houses[DECEASED] = NULL;
     }
 }
-
 
 int main()
 {
@@ -440,6 +456,21 @@ int main()
        scanf("%s", lastName);
        scanf("%s", houseName);
        scanf("%d", &number);
+
+       house = getHouse(houseName);
+       found = search(houses[house], firstName, lastName);
+       if( found == NULL )
+       {
+         printf("%s not found.", firstName);
+       }
+       else
+       {
+         int currentPoints = found->points;
+         currentPoints += number;
+         found->points = currentPoints;
+         printStudent(found, stdout);
+       }
+
      } else if (strcmp(input, "score") == 0)
      {
        printf("call score()\n");
