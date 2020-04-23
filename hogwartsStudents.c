@@ -10,8 +10,11 @@ Student* insert(Student* root, Student* node);
 Student* search(Student* root, char* first, char* last);
 Student* delete(Student** root, char* first, char* last);
 int compareStudent(Student* student, char* first, char* last);
-void printStudent(const Student* student);
+void printStudent(const Student* student, FILE* file);
 void quit(Student* root);
+void clearStudent(Student* root);
+void clear(Student* houses[]);
+void kill(char* first, char* last, House house);
 
 
 /*
@@ -62,8 +65,8 @@ void printInOrder(Student* root) {
 void printPreOrder(Student* root, FILE* file) {
   if (root != NULL) {
      printStudent(root, file);
-     printPreOrder(root->left);
-     printPreOrder(root->right);
+     printPreOrder(root->left, stdout);
+     printPreOrder(root->right, stdout);
   }
 }
 /*
@@ -141,7 +144,7 @@ That way, the file will match the structure of the trees you have generated.
 */
  void save(char filename[], Student* houses[])
  {
-  FILE* file = fopen(fileName, "w");
+  FILE* file = fopen(filename, "w");
   if (file == NULL)
   {
     printf("INVALID FILE\n");
@@ -154,8 +157,7 @@ That way, the file will match the structure of the trees you have generated.
     }
     fclose(file);
   }
-
-
+  
  }
 
 
@@ -197,13 +199,50 @@ Student* search(Student* root, char* first, char* last)
 /*
  * Function: delete, searches through a tree and removes the Student from the tree if the student exists.
  * Returns:  a pointer to a student.
-
+*/
 //Remove a student from a tree and return a pointer to the node containing the student or NULL if the student is not found.
 Student* delete(Student** root, char* first, char* last)
 {
-
+  if(*root == NULL) {
+    return NULL;
+  } else {
+    Student* temp = search(*root, first, last);
+    clearStudent(temp);
+    return temp;
+  }
 }
- */
+
+// void kill(char* first, char* last, char* house){
+//   Student* temp = search()
+// }
+
+/*
+ * Function: clearStudent, frees a tree.
+ * Returns:  a pointer to a student.
+*/
+
+void clearStudent(Student* root){
+    if (root != NULL) {
+        clear(&root->left);
+        clear(&root->right);
+        free(root->first);
+        free(root->last);
+        free(root);
+    }
+}
+
+/*
+ * Function: clearStudent, frees a tree.
+ * Returns:  a pointer to a student.
+*/
+
+void clear(Student* houses[]){
+    for(int i = 0; i < HOUSES; ++i) {
+        free(houses[i]);
+        houses[i] = NULL;
+    }
+}
+
 
 int main()
 {
@@ -227,35 +266,37 @@ int main()
 
    while(strcmp(input, "quit") != 0)
   {
-    printf("Please enter a command.\n");
+    printf("Enter command: ");
     scanf("%s", input);
 
      if (strcmp(input, "help") == 0)
      {
-       printf("load:\nAdds all the student records in <filename> to the roster. The file is arranged one student per line where each record has the following format.\n");
-       printf("\n");
-       printf("save:\nSave the records of all living students in the roster to <filename>.\n");
-       printf("\n");
-       printf("clear:\nClear the rosters for the four houses and for the list of deceased students. Delete all allocated memory.\n");
-       printf("\n");
-       printf("inorder:\nPrint out each house in an inorder traversal.\n");
-       printf("\n");
-       printf("preorder:\nPrint out each house in a preorder traversal.\n");
-       printf("\n");
-       printf("postorder:\nPrint out each house in a postorder traversal.\n");
-       printf("\n");
-       printf("add:\nAdd a student with the given attributes to the roster.\n");
-       printf("\n");
-       printf("kill:\nFind the given student in the given house's roster, remove the student from the house's roster, and add the student to the list of deceased students.\n");
-       printf("\n");
-       printf("find:\nFind the given student in the given house's roster and print out his or her data.\n");
-       printf("\n");
-       printf("points:\nFind the given student in the given house's roster and add <number> points to their point total.\n");
-       printf("\n");
-       printf("score:\nPrint out the current point scores for all houses. Points for deceased students are not factored into their house totals\n");
-       printf("\n");
-       printf("quit:\nQuit the program.\n");
-       printf("\n");
+       printf("help\n");
+       printf("Prints this display\n\n");
+       printf("load\n");
+       printf("Adds all the student records in <filename> to the roster. The file is arranged one student per line where each record has the following format\n\n");
+       printf("save\n");
+       printf("Save the records of all living students in the roster to <filename>\n\n");
+       printf("clear\n");
+       printf("Clear the rosters for the four houses and for the list of deceased students. Delete all allocated memory\n\n");
+       printf("inorder\n");
+       printf("Print out each house in an inorder traversal\n\n");
+       printf("preorder\n");
+       printf("Print out each house in a preorder traversal\n\n");
+       printf("postorder\n");
+       printf("Print out each house in a postorder traversal\n\n");
+       printf("add\n");
+       printf("Add a student with the given attributes to the roster\n\n");
+       printf("kill\n");
+       printf("Find the given student in the given house's roster, remove the student from the house's roster, and add the student to the list of deceased students\n\n");
+       printf("find\n");
+       printf("Find the given student in the given house's roster and print out his or her data\n\n");
+       printf("points\n");
+       printf("Find the given student in the given house's roster and add <number> points to their point total\n\n");
+       printf("score\n");
+       printf("Print out the current point scores for all houses. Points for deceased students are not factored into their house totals\n\n");
+       printf("quit\n");
+       printf("Quit the program\n\n");
      }
      else if (strcmp(input, "load") == 0)
      {
@@ -276,7 +317,8 @@ int main()
      }
      else if (strcmp(input, "clear") == 0)
      {
-       printf("call clear().\n");
+       printf("All data cleared.\n");
+       clear(houses);
      }
      else if (strcmp(input, "inorder") == 0)
      {
@@ -345,7 +387,7 @@ int main()
        if( found == NULL )
 					printf("%s not found.", firstName);
 				else
-					printStudent( found );
+					printStudent(found, stdout);
      }
      else if (strcmp(input, "points") == 0)
      {
