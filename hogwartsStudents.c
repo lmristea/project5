@@ -131,11 +131,6 @@ void load(FILE* file, Student* houses[]) {
   }
 }
 
-/*
- * Function: insert, inserts a node into a tree.
- * Returns:  a pointer to a student.
- */
-
 /*Save the records of all living students in the roster to <filename>.
 The format of the file should match what is read in by the load command.
 To match sample output, please print out the students in each house starting with Gryffindor, then Ravenclaw, then Hufflepuff, and finally Slytherin.
@@ -160,6 +155,11 @@ That way, the file will match the structure of the trees you have generated.
 
  }
 
+
+ /*
+  * Function: insert, inserts a node into a tree.
+  * Returns:  a pointer to a student.
+  */
 
 Student* insert(Student* root, Student* node)
 {
@@ -250,13 +250,8 @@ Student* delete(Student** root, char* first, char* last)
     return delete(&temp->right, first, last);
 }
 
-// void kill(char* first, char* last, char* house){
-//   Student* temp = search()
-// }
-
 /*
- * Function: clearStudent, frees a tree.
- * Returns:  a pointer to a student.
+ * Function: clearStudent, frees a student node.
 */
 
 void clearStudent(Student* root){
@@ -270,14 +265,15 @@ void clearStudent(Student* root){
 }
 
 /*
- * Function: clearStudent, frees a tree.
- * Returns:  a pointer to a student.
+ * Function: clear, frees a tree.
 */
 
 void clear(Student* houses[]){
     for(int i = 0; i < HOUSES; ++i) {
         clearStudent(houses[i]);
+        clearStudent(houses[DECEASED]);
         houses[i] = NULL;
+        houses[DECEASED] = NULL;
     }
 }
 
@@ -448,14 +444,14 @@ int main()
      {
        printf("call score()\n");
      }
+     else if (strcmp(input, "quit") == 0) {
+       clear(houses);
+       return 0;
+     }
      else
      {
        printf("Unknown command: %s\n", input);
      }
-
   }
-
-  printf("call quit()\n");
-
   return 0;
 }
