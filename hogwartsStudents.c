@@ -3,7 +3,7 @@
 #include <string.h>
 #include "Student.h"
 
-#define HOUSE_COUNT 5
+#define HOUSE 5
 
 Student* createStudent(char* first, char* last, int points, int year, House house);
 Student* insert(Student* root, Student* node);
@@ -43,7 +43,7 @@ Student* createStudent(char* first, char* last, int points, int year, House hous
 void printStudent(const Student* student, FILE* file) {
   char fullName[1024];
   sprintf(fullName, "%s %s", student->first, student->last);
-  fprintf(file, "%-25s%d\t%d\t%s\n", fullName, student->points, student->year, HOUSE_NAMES[student->house]);
+  fprintf(file, "%-25s Points: %d\t Year: %d\t House: %s\n", fullName, student->points, student->year, HOUSE_NAMES[student->house]);
 }
 
 /*
@@ -153,11 +153,11 @@ That way, the file will match the structure of the trees you have generated.
   {
     for(int i = 0; i < HOUSES; ++i)
     {
-      printPreOrder(houses[i], file);
+        printPreOrder(houses[i], file);
     }
     fclose(file);
   }
-  
+
  }
 
 
@@ -323,22 +323,22 @@ int main()
      else if (strcmp(input, "inorder") == 0)
      {
         /* If you add a bunch of students and try to print them, this works but returns a segmentation fault at the end. */
-        for(int i = 0; i < HOUSE_COUNT; ++i){
-          printf("\n%s\n", HOUSE_NAMES[i]);
+        for(int i = 0; i < HOUSE-1; ++i){
+          printf("\n%s House\n", HOUSE_NAMES[i]);
           printInOrder(houses[i]);
         }
      }
      else if (strcmp(input, "preorder") == 0)
      {
-       for(int i = 0; i < HOUSE_COUNT; ++i){
-          printf("\n%s\n", HOUSE_NAMES[i]);
+       for(int i = 0; i < HOUSE-1; ++i){
+          printf("\n%s House\n", HOUSE_NAMES[i]);
           printPreOrder(houses[i], stdout);
         }
      }
      else if (strcmp(input, "postorder") == 0)
      {
-       for(int i = 0; i < HOUSE_COUNT; ++i){
-          printf("\n%s\n", HOUSE_NAMES[i]);
+       for(int i = 0; i < HOUSE-1; ++i){
+          printf("\n%s House\n", HOUSE_NAMES[i]);
           printPostOrder(houses[i]);
         }
      }
@@ -398,6 +398,10 @@ int main()
      } else if (strcmp(input, "score") == 0)
      {
        printf("call score()\n");
+     }
+     else
+     {
+       printf("Unknown command: %s\n", input);
      }
 
   }
