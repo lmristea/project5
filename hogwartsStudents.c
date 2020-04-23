@@ -16,7 +16,7 @@ void quit(Student* root);
 
 /*
  * Function: createStudent, takes information about a student and creates a new node.
- * Returns:  a pointer to a student. 
+ * Returns:  a pointer to a student.
  */
 Student* createStudent(char* first, char* last, int points, int year, House house)
 {
@@ -34,13 +34,13 @@ Student* createStudent(char* first, char* last, int points, int year, House hous
 
 /*
  * Function: printStudent, prints student information
- * Returns:  
+ * Returns:
  */
 
-void printStudent(const Student* student) {
+void printStudent(const Student* student, FILE* file) {
   char fullName[1024];
   sprintf(fullName, "%s %s", student->first, student->last);
-  printf("%-25s%d\t%d\t%s\n", fullName, student->points, student->year, HOUSE_NAMES[student->house]);
+  fprintf(file, "%-25s%d\t%d\t%s\n", fullName, student->points, student->year, HOUSE_NAMES[student->house]);
 }
 
 /*
@@ -50,7 +50,7 @@ void printStudent(const Student* student) {
 void printInOrder(Student* root) {
   if (root != NULL) {
     printInOrder(root->left);
-    printStudent(root);
+    printStudent(root, stdout);
     printInOrder(root->right);
   }
 }
@@ -59,14 +59,13 @@ void printInOrder(Student* root) {
  * Function: printPreOrder, takes a pointer to a student,
  * Returns:  Nothing. Prints the tree from root -> left subtree -> right subtree.
  */
-void printPreOrder(Student* root) {
+void printPreOrder(Student* root, FILE* file) {
   if (root != NULL) {
-     printStudent(root);
+     printStudent(root, file);
      printPreOrder(root->left);
      printPreOrder(root->right);
   }
 }
-
 /*
  * Function: printPostOrder, takes a pointer to a student,
  * Returns:  Nothing. Prints the tree from left subtree -> right subtree -> root.
@@ -75,12 +74,12 @@ void printPostOrder(Student* root) {
   if(root != NULL) {
     printPostOrder(root->left);
     printPostOrder(root->right);
-    printStudent(root);
+    printStudent(root, stdout);
   }
 }
 
 /*
- * Function: compareStudent, takes a pointer to a student, then compares the node's name 
+ * Function: compareStudent, takes a pointer to a student, then compares the node's name
  *            with the given first and last name.
  * Returns:  an int, 0 if they are equal, greater than 0 if the s1 is > than s2, and less than 0 if s1 > s2.
  */
@@ -94,7 +93,7 @@ int compareStudent(Student* student, char* first, char* last) {
 
 /*
  * Function: getHouse, takes a string.
- * Returns:  an int, 0 if the string passed in is equal to one of the Houses, 
+ * Returns:  an int, 0 if the string passed in is equal to one of the Houses,
  *           anything else will return an error if not found.
  */
 
@@ -131,10 +130,36 @@ void load(FILE* file, Student* houses[]) {
 
 /*
  * Function: insert, inserts a node into a tree.
- * Returns:  a pointer to a student. 
+ * Returns:  a pointer to a student.
  */
 
-Student* insert(Student* root, Student* node) 
+/*Save the records of all living students in the roster to <filename>.
+The format of the file should match what is read in by the load command.
+To match sample output, please print out the students in each house starting with Gryffindor, then Ravenclaw, then Hufflepuff, and finally Slytherin.
+Each house should be printed in a preorder traversal.
+That way, the file will match the structure of the trees you have generated.
+*/
+ void save(char filename[], Student* houses[])
+ {
+  FILE* file = fopen(fileName, "w");
+  if (file == NULL)
+  {
+    printf("INVALID FILE\n");
+  }
+  else
+  {
+    for(int i = 0; i < HOUSES; ++i)
+    {
+      printPreOrder(houses[i], file);
+    }
+    fclose(file);
+  }
+
+
+ }
+
+
+Student* insert(Student* root, Student* node)
 {
   if(root == NULL) {
     return node;
@@ -142,17 +167,17 @@ Student* insert(Student* root, Student* node)
   int difference = compareStudent(root, node->first, node->last);
   if( difference == 0)
     printf("Error: Student exist");
-  else if(difference > 0) 
+  else if(difference > 0)
     root->left = insert(root->left, node);
-  else 
+  else
     root->right = insert(root->right, node);
-  
+
   return root;
 }
 
 /*
  * Function: search, searches for a student by first and last name.
- * Returns:  a pointer to a student. 
+ * Returns:  a pointer to a student.
  */
 
 Student* search(Student* root, char* first, char* last)
@@ -161,22 +186,22 @@ Student* search(Student* root, char* first, char* last)
     return root;
   }
   int difference = compareStudent(root, first, last);
-  if(difference == 0) 
+  if(difference == 0)
     return root;
   else if(difference > 0) {
-    return search(root->left, first, last); 
-  } else 
+    return search(root->left, first, last);
+  } else
     return search(root->right, first, last);
 }
 
 /*
  * Function: delete, searches through a tree and removes the Student from the tree if the student exists.
- * Returns:  a pointer to a student. 
+ * Returns:  a pointer to a student.
 
 //Remove a student from a tree and return a pointer to the node containing the student or NULL if the student is not found.
 Student* delete(Student** root, char* first, char* last)
 {
-  
+
 }
  */
 
@@ -184,7 +209,7 @@ int main()
 {
   //an array (one for each house) initialized to null.
   Student* houses[] = { NULL, NULL, NULL, NULL, NULL };
-  
+
   Student* found = NULL;
 
   // intialize all arrays to size 1024, so we can fill them later
@@ -234,6 +259,7 @@ int main()
      }
      else if (strcmp(input, "load") == 0)
      {
+       //move these into the load function
       scanf("%s", fileName);
       FILE* file = fopen(fileName, "r");
       if(file == NULL){
@@ -246,6 +272,7 @@ int main()
      else if (strcmp(input, "save") == 0)
      {
       scanf("%s", fileName);
+      save(fileName, houses);
      }
      else if (strcmp(input, "clear") == 0)
      {
@@ -263,7 +290,7 @@ int main()
      {
        for(int i = 0; i < HOUSE_COUNT; ++i){
           printf("\n%s\n", HOUSE_NAMES[i]);
-          printPreOrder(houses[i]);
+          printPreOrder(houses[i], stdout);
         }
      }
      else if (strcmp(input, "postorder") == 0)
