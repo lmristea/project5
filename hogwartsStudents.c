@@ -15,6 +15,7 @@ void quit(Student* root);
 void clearStudent(Student* root);
 void clear(Student* houses[]);
 void kill(char* first, char* last, House house);
+int getScore(Student* root);
 
 
 /*
@@ -123,15 +124,18 @@ void load(FILE* file, Student* houses[])
   int points;
   int year;
   House house;
-  /* There are 5 things to be read on each line for a student. */
-  while(fscanf(file, "%s %s %d %d %s", firstName, lastName, &points, &year, houseName) == 5) {
+  while(fscanf(file, "%s %s %d %d %s", firstName, lastName, &points, &year, houseName) == 5)
+  {
       house = getHouse(houseName);
 
-       if(year < 1 || year > 7){
-         printf("Invalid year.\n");
-       } else if(house == -1 ){
+       if(house == -1)
+       {
          printf("Invalid house.\n");
-       } else {
+       } else if(year < 1 || year > 7)
+       {
+         printf("Invalid year.\n");
+       } else
+       {
         Student* node = createStudent(firstName, lastName, points, year, house);
         houses[house] = insert(houses[house], node);
        }
@@ -275,9 +279,16 @@ void clearStudent(Student* root)
 /*
  * Function: getScore: counts up the total points in each house.
  */
-int getScore()
+int getScore(Student* root)
   {
-
+    if (root == NULL)
+    {
+      return 0;
+    }
+    else
+    {
+      return root->points + getScore(root->left) + getScore(root->right);
+    }
   }
 
 /*
@@ -354,8 +365,9 @@ int main()
       scanf("%s", fileName);
       FILE* file = fopen(fileName, "r");
       if(file == NULL){
-        printf("File DNE.");
+        printf("Load failed. Invalid file: %s.\n", fileName);
       } else {
+        printf("Successfully loaded data from file %s.\n", fileName);
         load(file, houses);
         fclose(file);
       }
@@ -363,7 +375,15 @@ int main()
      else if (strcmp(input, "save") == 0)
      {
       scanf("%s", fileName);
+      if (fileName == NULL)
+      {
+        printf("Save failed. Invalid file: %s\n", fileName);
+      }
+      else
+      {
       save(fileName, houses);
+      }
+
      }
      else if (strcmp(input, "clear") == 0)
      {
@@ -473,7 +493,11 @@ int main()
 
      } else if (strcmp(input, "score") == 0)
      {
-       printf("call score()\n");
+       printf("Point totals:\n\n");
+       for(int i = 0; i < HOUSES; ++i)
+       {
+          printf("%s House:\t%d\n", HOUSE_NAMES[i], getScore(houses[i]));
+        }
      }
      else if (strcmp(input, "quit") == 0) {
        clear(houses);
