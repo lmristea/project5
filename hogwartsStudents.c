@@ -3,7 +3,7 @@
 #include <string.h>
 #include "Student.h"
 
-#define HOUSE 5
+#define HOUSE_COUNT 5
 
 Student* createStudent(char* first, char* last, int points, int year, House house);
 Student* insert(Student* root, Student* node);
@@ -323,21 +323,21 @@ int main()
      else if (strcmp(input, "inorder") == 0)
      {
         /* If you add a bunch of students and try to print them, this works but returns a segmentation fault at the end. */
-        for(int i = 0; i < HOUSE-1; ++i){
+        for(int i = 0; i < HOUSES; ++i){
           printf("\n%s House\n", HOUSE_NAMES[i]);
           printInOrder(houses[i]);
         }
      }
      else if (strcmp(input, "preorder") == 0)
      {
-       for(int i = 0; i < HOUSE-1; ++i){
+       for(int i = 0; i < HOUSES; ++i){
           printf("\n%s House\n", HOUSE_NAMES[i]);
           printPreOrder(houses[i], stdout);
         }
      }
      else if (strcmp(input, "postorder") == 0)
      {
-       for(int i = 0; i < HOUSE-1; ++i){
+       for(int i = 0; i < HOUSES; ++i){
           printf("\n%s House\n", HOUSE_NAMES[i]);
           printPostOrder(houses[i]);
         }
