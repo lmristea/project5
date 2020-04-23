@@ -3,7 +3,7 @@
 #include <string.h>
 #include "Student.h"
 
-#define HOUSE_COUNT 5
+#define DECEASED 4
 
 Student* createStudent(char* first, char* last, int points, int year, House house);
 Student* insert(Student* root, Student* node);
@@ -65,8 +65,8 @@ void printInOrder(Student* root) {
 void printPreOrder(Student* root, FILE* file) {
   if (root != NULL) {
      printStudent(root, file);
-     printPreOrder(root->left, stdout);
-     printPreOrder(root->right, stdout);
+     printPreOrder(root->left, file);
+     printPreOrder(root->right, file);
   }
 }
 /*
@@ -203,13 +203,51 @@ Student* search(Student* root, char* first, char* last)
 //Remove a student from a tree and return a pointer to the node containing the student or NULL if the student is not found.
 Student* delete(Student** root, char* first, char* last)
 {
-  if(*root == NULL) {
-    return NULL;
-  } else {
-    Student* temp = search(*root, first, last);
-    clearStudent(temp);
+  Student* temp = *root;
+  if(temp == NULL) {
     return temp;
   }
+  int difference = compareStudent(temp, first, last);
+  if(difference == 0)
+  {
+    if (temp->left == NULL)
+    {
+      *root = temp->right;
+    }
+    else if(temp->right == NULL)
+    {
+      *root = temp->left;
+    }
+    else
+    {
+      if (temp->right->left == NULL)
+      {
+        *root = temp->right;
+        temp->right->left = temp->left;
+      }
+      else
+      {
+        Student* parent = temp->right;
+        Student* current = temp->right->left;
+        while(current->left != NULL)
+        {
+          parent = current;
+          current = current->left;
+        }
+        *root = current;
+        parent->left = current->right;
+        current->left = temp->left;
+        current->right = temp->right;
+      }
+    }
+    temp->left = NULL;
+    temp->right = NULL;
+    return temp;
+  }
+  else if(difference > 0) {
+    return delete(&temp->left, first, last);
+  } else
+    return delete(&temp->right, first, last);
 }
 
 // void kill(char* first, char* last, char* house){
@@ -223,8 +261,8 @@ Student* delete(Student** root, char* first, char* last)
 
 void clearStudent(Student* root){
     if (root != NULL) {
-        clear(&root->left);
-        clear(&root->right);
+        clearStudent(root->left);
+        clearStudent(root->right);
         free(root->first);
         free(root->last);
         free(root);
@@ -238,7 +276,7 @@ void clearStudent(Student* root){
 
 void clear(Student* houses[]){
     for(int i = 0; i < HOUSES; ++i) {
-        free(houses[i]);
+        clearStudent(houses[i]);
         houses[i] = NULL;
     }
 }
@@ -327,6 +365,8 @@ int main()
           printf("\n%s House\n", HOUSE_NAMES[i]);
           printInOrder(houses[i]);
         }
+        printf("\nDeceased\n");
+        printInOrder(houses[DECEASED]);
      }
      else if (strcmp(input, "preorder") == 0)
      {
@@ -334,6 +374,8 @@ int main()
           printf("\n%s House\n", HOUSE_NAMES[i]);
           printPreOrder(houses[i], stdout);
         }
+        printf("\nDeceased\n");
+        printPreOrder(houses[DECEASED], stdout);
      }
      else if (strcmp(input, "postorder") == 0)
      {
@@ -341,18 +383,15 @@ int main()
           printf("\n%s House\n", HOUSE_NAMES[i]);
           printPostOrder(houses[i]);
         }
+        printf("\nDeceased\n");
+        printPostOrder(houses[DECEASED]);
      }
      else if (strcmp(input, "add") == 0)
      {
-       printf("Student's First Name: ");
        scanf("%s", firstName);
-       printf("Student's Last Name: ");
        scanf("%s", lastName);
-       printf("Student's Points: ");
        scanf("%d", &points);
-       printf("Student's Year Number: ");
        scanf("%d", &year);
-       printf("Student's House Name: ");
        scanf("%s", houseName);
        house = getHouse(houseName);
 
@@ -367,22 +406,32 @@ int main()
      }
      else if (strcmp(input, "kill") == 0)
      {
-      printf("Student's First Name: ");
       scanf("%s", firstName);
-      printf("Student's Last Name: ");
       scanf("%s", lastName);
-      printf("Student's House Name: ");
       scanf("%s", houseName);
+      house = getHouse(houseName);
+      if(house == -1 ){
+        printf("Invalid house.\n");
+      } else {
+       Student* node = delete(&houses[house],firstName, lastName);
+       if (node == NULL)
+       {
+         printf("failed to find student. \n");
+       }
+       else
+       {
+         houses[DECEASED] = insert(houses[DECEASED], node);
+       }
+      }
      }
      else if (strcmp(input, "find") == 0)
      {
-       printf("Student's First Name: ");
        scanf("%s", firstName);
-       printf("Student's Last Name: ");
        scanf("%s", lastName);
-       printf("Student's House Name: ");
        scanf("%s", houseName);
        house = getHouse(houseName);
+       //catch error if house doesn't exist like on line 399
+
        found = search(houses[house], firstName, lastName);
        if( found == NULL )
 					printf("%s not found.", firstName);
