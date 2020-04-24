@@ -116,8 +116,9 @@ int getHouse(char* house)
   return -1;
 }
 
-void load(FILE* file, Student* houses[])
+void load(char fileName[], Student* houses[])
 {
+  FILE* file = fopen(fileName, "r");
   char firstName[1024];
   char lastName[1024];
   char houseName[1024];
@@ -363,13 +364,11 @@ int main()
      {
        //move these into the load function
       scanf("%s", fileName);
-      FILE* file = fopen(fileName, "r");
-      if(file == NULL){
+      if(fileName == NULL){
         printf("Load failed. Invalid file: %s.\n", fileName);
       } else {
         printf("Successfully loaded data from file %s.\n", fileName);
-        load(file, houses);
-        fclose(file);
+        load(fileName, houses);
       }
      }
      else if (strcmp(input, "save") == 0)
@@ -381,7 +380,8 @@ int main()
       }
       else
       {
-      save(fileName, houses);
+        printf("Successfully saved data to file %s.\n", fileName);
+        save(fileName, houses);
       }
 
      }
