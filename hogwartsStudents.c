@@ -447,7 +447,7 @@ int main()
       scanf("%s", houseName);
       house = getHouse(houseName);
       if(house == -1 ){
-        printf("Kill failed. Invalid house: %u\n", houseName);
+        printf("Kill failed. Invalid house: %s\n", houseName);
       } else {
        Student* node = delete(&houses[house],firstName, lastName);
        if (node == NULL)
@@ -468,7 +468,7 @@ int main()
        house = getHouse(houseName);
        //catch error if house doesn't exist like on line 399
         if(house == -1 ){
-        printf("Kill failed. Invalid house: %u\n", houseName);
+        printf("Kill failed. Invalid house: %s\n", houseName);
         }
        found = search(houses[house], firstName, lastName);
        if( found == NULL )
@@ -490,7 +490,7 @@ int main()
        found = search(houses[house], firstName, lastName);
        if( found == NULL )
        {
-         printf("Point change failed. %s %s was not found in %u House\n", firstName, lastName, houseName);
+         printf("Point change failed. %s %s was not found in %s House\n", firstName, lastName, houseName);
        }
        else
        {
