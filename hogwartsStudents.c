@@ -179,7 +179,7 @@ Student* insert(Student* root, Student* node)
   }
   int difference = compareStudent(root, node->first, node->last);
   if( difference == 0)
-    printf("Error: Student exist");
+    printf("Add failed. Student named %s %s already present in roster.\n", root->first, root->last);
   else if(difference > 0)
     root->left = insert(root->left, node);
   else
@@ -428,11 +428,15 @@ int main()
        house = getHouse(houseName);
 
        if(year < 1 || year > 7){
-         printf("Invalid year.\n");
+         printf("Add failed. Invalid year: %d\n", year);
        } else if(house == -1 ){
-         printf("Invalid house.\n");
+         printf("Add failed. Invalid house: %s\n", houseName);
        } else {
         Student* node = createStudent(firstName, lastName, points, year, house);
+        if (node == NULL) {
+          // CHECK THIS LINE
+          printf("Add failed. Student named %s %s already present in roster.\n", firstName, lastName);
+        }
         houses[house] = insert(houses[house], node);
        }
      }
@@ -443,12 +447,12 @@ int main()
       scanf("%s", houseName);
       house = getHouse(houseName);
       if(house == -1 ){
-        printf("Invalid house.\n");
+        printf("Kill failed. Invalid house: %u\n", houseName);
       } else {
        Student* node = delete(&houses[house],firstName, lastName);
        if (node == NULL)
        {
-         printf("failed to find student. \n");
+         printf("Kill failed. %s %s was not found in %s House\n", firstName, lastName, houseName);
        }
        else
        {
@@ -463,10 +467,12 @@ int main()
        scanf("%s", houseName);
        house = getHouse(houseName);
        //catch error if house doesn't exist like on line 399
-
+        if(house == -1 ){
+        printf("Kill failed. Invalid house: %u\n", houseName);
+        }
        found = search(houses[house], firstName, lastName);
        if( found == NULL )
-					printf("%s not found.", firstName);
+					printf("Find failed. %s %s was not found in %s House\n", firstName, lastName, houseName);
 				else
 					printStudent(found, stdout);
      }
@@ -478,10 +484,13 @@ int main()
        scanf("%d", &number);
 
        house = getHouse(houseName);
+       if(house == -1 ){
+        printf("Point change failed. Invalid house: %s\n", houseName);
+       }
        found = search(houses[house], firstName, lastName);
        if( found == NULL )
        {
-         printf("%s not found.", firstName);
+         printf("Point change failed. %s %s was not found in %u House\n", firstName, lastName, houseName);
        }
        else
        {
